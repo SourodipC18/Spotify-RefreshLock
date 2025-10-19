@@ -1,0 +1,123 @@
+
+
+## 🧠 Feature Name
+**Refresh Lock** (aka “Freeze & Revert” for Auto-Generated Playlists)
+
+---
+
+## 🎯 Purpose
+To give users control over Spotify’s auto-generated playlists (like *Daily Mix*, *Discover Weekly*, *Release Radar*) by allowing them to:
+- **Freeze** a playlist to prevent it from updating
+- **Revert** to a previous version of the playlist
+
+---
+
+## 🖱️ User Interface Components
+
+### 1. **Freeze Toggle Button**
+- **Location**: Top-right corner of each auto-generated playlist
+- **Label**: “Freeze Playlist”
+- **State**:
+  - ON: Playlist remains static and does not update
+  - OFF: Playlist updates normally
+
+### 2. **Revert Button**
+- **Location**: Below the Freeze toggle
+- **Label**: “Revert to Previous”
+- **Function**: Loads the last version of the playlist before the most recent update
+
+### 3. **Version History Dropdown** (Optional)
+- **Label**: “View Past Versions”
+- **Function**: Shows last 3–5 versions of the playlist with timestamps
+
+---
+
+## 🧰 Backend Logic
+
+### Playlist Versioning
+- Each auto-generated playlist is saved as a **daily snapshot**.
+- Snapshots are stored for **up to 7 days**.
+- When “Freeze” is ON:
+  - Spotify serves the last saved version instead of generating a new one.
+  - No new snapshot is created until Freeze is turned OFF.
+
+### Revert Function
+- When “Revert” is clicked:
+  - The playlist is replaced with the previous day’s snapshot.
+  - Optionally, users can choose from a dropdown of past versions.
+
+---
+
+## 🔐 Data Model (Simplified)
+
+```json
+{
+  "playlist_id": "daily_mix_1",
+  "user_id": "123456",
+  "frozen": true,
+  "current_version": {
+    "date": "2025-10-12",
+    "tracks": [ ... ]
+  },
+  "version_history": [
+    {
+      "date": "2025-10-11",
+      "tracks": [ ... ]
+    },
+    {
+      "date": "2025-10-10",
+      "tracks": [ ... ]
+    }
+  ]
+}
+```
+
+---
+
+## 🔌 API Endpoints (Hypothetical)
+
+### `POST /playlist/freeze`
+```json
+{
+  "playlist_id": "daily_mix_1",
+  "user_id": "123456",
+  "freeze": true
+}
+```
+
+### `GET /playlist/versions?playlist_id=daily_mix_1`
+Returns list of past versions
+
+### `POST /playlist/revert`
+```json
+{
+  "playlist_id": "daily_mix_1",
+  "user_id": "123456",
+  "target_date": "2025-10-11"
+}
+```
+
+---
+
+## 🧪 Edge Cases to Handle
+- What happens if a user freezes a playlist for 30 days? (Storage limits)
+- What if a user reverts to a version with unavailable tracks?
+- Should users be able to “pin” a version permanently?
+
+---
+
+## 🧑‍💻 Tech Stack Suggestions (for prototyping)
+- **Frontend**: React + Tailwind CSS
+- **Backend**: Node.js + Express
+- **Database**: MongoDB or Firebase
+- **Spotify API**: Use [Spotify Web API](https://developer.spotify.com/documentation/web-api/) to fetch playlist data
+
+---
+
+You can now copy this spec into any AI coding tool (like GitHub Copilot, ChatGPT, or Replit) and ask it to generate:
+- UI mockups
+- Backend logic
+- API endpoints
+- Full-stack prototype
+
+If you want, I can help you start building this in code or even write the README for your GitHub repo. Just say the word.

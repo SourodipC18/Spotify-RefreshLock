@@ -1,0 +1,98 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:4.4
+        ports:
+          - 27017:27017
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: server/package-lock.json
+    
+    - name: Install backend dependencies
+      run: |
+        cd server
+        npm ci
+    
+    - name: Run backend tests
+      run: |
+        cd server
+        npm test
+      env:
+        MONGODB_URI: mongodb://localhost:27017/test
+        SPOTIFY_CLIENT_ID: test_client_id
+        SPOTIFY_CLIENT_SECRET: test_client_secret
+        JWT_SECRET: test_jwt_secret
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: client/package-lock.json
+    
+    - name: Install frontend dependencies
+      run: |
+        cd client
+        npm ci
+    
+    - name: Run frontend tests
+      run: |
+        cd client
+        npm test -- --coverage --watchAll=false
+      env:
+        CI: true
+    
+    - name: Build frontend
+      run: |
+        cd client
+        npm run build
+
+  build-and-deploy:
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install all dependencies
+      run: npm run install-all
+    
+    - name: Build application
+      run: |
+        cd client
+        npm run build
+    
+    - name: Deploy to production
+      run: echo "Deploy to your hosting platform here"
+      # Add your deployment commands here
+
