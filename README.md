@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # 🎵 Spotify Refresh Lock
 
 **Freeze & Revert Auto-Generated Playlists**
@@ -160,4 +160,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 =======
 # Spotify-RefreshLock
 An innovative Spotify companion app that leverages the Spotify Web API to give users complete control over auto-generated playlists through freezing, reverting, and version history tracking.
->>>>>>> eff03dfb58ca2685e026b9ae630fc525daa5d42e
+
